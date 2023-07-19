@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="shortcut icon" type="image/png" href="favicon.png"/>
+    <title>VideoStreamer</title>
+</head>
+<body>
+<h2>WebRTC video streaming</h2>
+
+<div class="videos">
+      <span>
+        <h3>Ваше видео</h3>
+        <video id="webcamVideo" autoplay playsinline></video>
+      </span>
+    <span>
+        <h3>Удаленное видео</h3>
+        <video id="remoteVideo" autoplay playsinline></video>
+      </span>
+</div>
+<h1 id="status">Status: Waiting...</h1>
+<div class="container">
+    <div>
+        <button id="webcamButton">Включить камеру</button>
+        <label>ID клиента</label>
+        <h2 id="localID" class="text">******</h2>
+    </div>
+    <div>
+        <button id="callButton" disabled>Позвонить</button>
+        <label for="callInput">ID клиента</label><input class="text" id="callInput" maxlength="6" disabled/>
+    </div>
+    <div>
+        <button id="answerButton" disabled>Ответить</button>
+        <label>ID клиента</label>
+        <h2 id="remoteID" class="text">******</h2>
+    </div>
+    <div>
+        <button id="hangupButton" disabled>Сбросить</button>
+    </div>
+</div>
+</body>
+</html>
