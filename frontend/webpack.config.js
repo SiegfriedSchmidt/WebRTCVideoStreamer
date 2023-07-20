@@ -45,10 +45,15 @@ module.exports = {
         },
         open: true,
         compress: true,
-         https: {
+        https: {
             key: readFileSync("certs/tls.key"),
             cert: readFileSync("certs/tls.crt"),
             ca: readFileSync("certs/tls.csr"),
+        },
+        proxy: {
+            '/socket.io': {
+                target: 'http://localhost:9449',
+            },
         },
         host: '192.168.1.15',
         port: 8080

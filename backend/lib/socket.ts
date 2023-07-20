@@ -1,9 +1,10 @@
+import {Server as HttpServer} from "http";
 import {Server as HttpsServer} from "https";
-import {Server, Socket} from "socket.io";
+import {Server as IOServer, Socket} from "socket.io";
 import {customAlphabet} from "nanoid";
 import {ClientToServerEvents, ServerToClientEvents} from "./socketEvents";
 
-const getID = customAlphabet('ABC', 6)
+const getID = customAlphabet('ABCD', 6)
 
 interface InterServerEvents {
 
@@ -15,8 +16,9 @@ interface SocketData {
 
 type SocketType = Socket<ClientToServerEvents, ServerToClientEvents, InterServerEvents, SocketData>
 
-export default (server: HttpsServer) => {
-    const io = new Server<ClientToServerEvents, ServerToClientEvents, InterServerEvents, SocketData>(server, {
+export default (server: HttpsServer | HttpServer) => {
+    const io = new IOServer<ClientToServerEvents, ServerToClientEvents, InterServerEvents, SocketData>(server, {
+        path: '/socket.io/',
         cors: {
             origin: '*'
         }
@@ -26,7 +28,7 @@ export default (server: HttpsServer) => {
 
 const clients: { [key: string]: SocketType } = {}
 
-function socketOnConnection(io: Server, socket: SocketType) {
+function socketOnConnection(io: IOServer, socket: SocketType) {
     socket.data.id = getID()
     clients[socket.data.id] = socket
     socket.emit('connected', socket.data.id)
@@ -38,10 +40,20 @@ function socketOnConnection(io: Server, socket: SocketType) {
     })
 
     socket.on('sendSDP', ({id, data}, callback) => {
-        console.log(`send sdp from ${socket.data.id} to ${id}`)
         if (id in clients && id != socket.data.id) {
-            callback({error: false})
+            console.log(`send sdp from ${socket.data.id} to ${id}`)
             clients[id].emit('receiveSDP', ({id: socket.data.id, data}))
+            callback({error: false})
+        } else {
+            callback({error: true})
+        }
+    })
+
+    socket.on('sendIceCandidate', ({id, data}, callback) => {
+        if (id in clients && id != socket.data.id) {
+            console.log(`send ice candidate from ${socket.data.id} to ${id}`)
+            clients[id].emit('receiveIceCandidate', ({id: socket.data.id, data}))
+            callback({error: false})
         } else {
             callback({error: true})
         }

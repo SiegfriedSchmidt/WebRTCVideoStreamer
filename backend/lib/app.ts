@@ -1,13 +1,9 @@
-import * as https from "https";
-import {readFileSync} from "fs";
+import * as http from "http";
 import createSocket from "./socket";
 
-const PORT = process.env.PORT || 9449
-const server = https.createServer({
-    key: readFileSync("certs/tls.key"),
-    cert: readFileSync("certs/tls.crt"),
-    ca: readFileSync("certs/tls.csr"),
-})
+const PORT = Number(process.env.PORT) || 9449
+const ENV = process.env.NODE_ENV || 'development';
 
+const server = http.createServer()
 createSocket(server)
-server.listen(PORT, () => console.info(`Server running on port ${PORT}`));
+server.listen(PORT, 'localhost', () => console.info(`Server running on port ${PORT} in ${ENV} mode`));

@@ -13,11 +13,8 @@ const servers: RTCConfiguration = {
 // Global State
 let socket: Socket<ServerToClientEvents, ClientToServerEvents>
 const peerConnection = new RTCPeerConnection(servers)
-console.log(peerConnection.iceGatheringState);
-peerConnection.onicecandidate = (event) => {
-    console.log('ICE CANDIDATE')
-    console.log(event.candidate)
-};
+let localID: string;
+let remoteID: string;
 let localStream: MediaStream = null;
 let remoteStream: MediaStream = null;
 
@@ -29,8 +26,8 @@ const callButton = document.getElementById('callButton') as HTMLButtonElement;
 const callInput = document.getElementById('callInput') as HTMLInputElement;
 const answerButton = document.getElementById('answerButton') as HTMLButtonElement;
 const hangupButton = document.getElementById('hangupButton') as HTMLButtonElement;
-const localID = document.getElementById('localID') as HTMLLabelElement;
-const remoteID = document.getElementById('remoteID') as HTMLLabelElement;
+const localIDLabel = document.getElementById('localID') as HTMLLabelElement;
+const remoteIDLabel = document.getElementById('remoteID') as HTMLLabelElement;
 const statusText = document.getElementById('status') as HTMLLabelElement;
 
 function setStatus(status: string) {
@@ -40,9 +37,10 @@ function setStatus(status: string) {
 // Setup media sources
 webcamButton.onclick = async () => {
     setStatus('Starting web camera...')
-    // localStream = await navigator.mediaDevices.getUserMedia({video: true, audio: true});
+    // localStream = await navigator.mediaDevices.getUserMedia({video: {facingMode: 'environment'}, audio: false});
+    localStream = await navigator.mediaDevices.getUserMedia({video: true, audio: true});
     setStatus('Web camera started.')
-    localStream = new MediaStream()
+    // localStream = new MediaStream()
     remoteStream = new MediaStream();
 
     // Push tracks from local stream to peer connection
@@ -68,17 +66,26 @@ webcamButton.onclick = async () => {
 
     setStatus("Socket connecting...")
     socketConnect()
+
+    peerConnection.onicecandidate = (event) => {
+        if (event.candidate) {
+            socket.emit('sendIceCandidate', {id: remoteID, data: event.candidate}, () => {
+            })
+        }
+    };
 };
 
 function socketConnect() {
-    socket = io("https://192.168.1.15:9449")
+    socket = io({path: '/socket.io/'})
     socket.on("connected", (id) => {
         console.log(`connected ${id}`)
-        localID.innerText = id
+        localIDLabel.innerText = id
+        localID = id
         setStatus("Socket connected.")
     })
 
     socket.on('receiveSDP', async ({id, data}) => {
+        remoteID = id
         await peerConnection.setRemoteDescription(data);
         if (!peerConnection.localDescription) {
             setStatus(`receive offer from "${id}"`)
@@ -90,16 +97,24 @@ function socketConnect() {
             setStatus(`receive answer from "${id}"`)
         }
     })
+
+    socket.on('receiveIceCandidate', async ({id, data}) => {
+        await peerConnection.addIceCandidate(data)
+    })
 }
 
 callButton.onclick = async () => {
     setStatus(`Sending offer to remote ID "${callInput.value}"...`)
     const offerDescription = await peerConnection.createOffer();
-    await peerConnection.setLocalDescription(offerDescription);
-    socket.emit('sendSDP', {id: callInput.value, data: peerConnection.localDescription}, ({error}) => {
+    remoteID = callInput.value.toUpperCase()
+    socket.emit('sendSDP', {
+        id: remoteID,
+        data: {type: offerDescription.type, sdp: offerDescription.sdp}
+    }, async ({error}) => {
         if (error) {
             setStatus(`Error! Incorrect ID "${callInput.value}"!`)
         } else {
+            await peerConnection.setLocalDescription(offerDescription);
             setStatus(`Send offer to remote ID "${callInput.value}".`)
         }
     })
