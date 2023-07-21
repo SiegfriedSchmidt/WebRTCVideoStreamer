@@ -13,32 +13,34 @@
 
 <div class="videos">
       <span>
-        <h3>Ваше видео</h3>
         <video id="webcamVideo" autoplay playsinline></video>
       </span>
     <span>
-        <h3>Удаленное видео</h3>
         <video id="remoteVideo" autoplay playsinline></video>
       </span>
 </div>
-<h1 id="status">Status: Waiting...</h1>
+<div>
+
+</div>
 <div class="container">
-    <div>
-        <button id="webcamButton">Включить камеру</button>
-        <label>ID клиента</label>
-        <h2 id="localID" class="text">******</h2>
+    <div class="container-fields">
+        <div>
+            <button id="webcamButton">Включить камеру</button>
+            <h2 id="localID" class="text">******</h2>
+        </div>
+        <div>
+            <button id="callButton" disabled>Позвонить</button>
+            <input class="text" id="callInput" maxlength="4" disabled/>
+        </div>
+        <div>
+            <button id="answerButton" disabled>Ответить</button>
+            <h2 id="remoteID" class="text">******</h2>
+        </div>
+        <div>
+            <button id="hangupButton" disabled>Сбросить</button>
+        </div>
     </div>
-    <div>
-        <button id="callButton" disabled>Позвонить</button>
-        <label for="callInput">ID клиента</label><input class="text" id="callInput" maxlength="6" disabled/>
-    </div>
-    <div>
-        <button id="answerButton" disabled>Ответить</button>
-        <label>ID клиента</label>
-        <h2 id="remoteID" class="text">******</h2>
-    </div>
-    <div>
-        <button id="hangupButton" disabled>Сбросить</button>
+    <div id='logs' class="log-block">
     </div>
 </div>
 </body>

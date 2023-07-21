@@ -4,7 +4,7 @@ import {Server as IOServer, Socket} from "socket.io";
 import {customAlphabet} from "nanoid";
 import {ClientToServerEvents, ServerToClientEvents} from "./socketEvents";
 
-const getID = customAlphabet('ABCD', 6)
+const getID = customAlphabet('0123456789', 4)
 
 interface InterServerEvents {
 
