@@ -1,10 +1,8 @@
 import {Server as HttpServer} from "http";
 import {Server as HttpsServer} from "https";
 import {Server as IOServer, Socket} from "socket.io";
-import {customAlphabet} from "nanoid";
 import {ClientToServerEvents, ServerToClientEvents} from "./socketEvents";
-
-const getID = customAlphabet('0123456789', 4)
+import verifyTokenService from "./services/verifyTokenService";
 
 interface InterServerEvents {
 
@@ -29,7 +27,12 @@ export default (server: HttpsServer | HttpServer) => {
 const clients: { [key: string]: SocketType } = {}
 
 function socketOnConnection(io: IOServer, socket: SocketType) {
-    socket.data.id = getID()
+    const userID = verifyTokenService(socket.handshake.query.authorization as string)
+    if (!userID) {
+        return socket.disconnect()
+    }
+
+    socket.data.id = userID
     clients[socket.data.id] = socket
     socket.emit('connected', socket.data.id)
     console.log(`user connected ${socket.data.id}`)
