@@ -3,8 +3,8 @@ import {RequestHandler} from "express";
 
 const handler: RequestHandler = (req, res, next) => {
     try {
-        if (req.headers.authorization) {
-            req.id = verifyTokenService(req.headers.authorization)
+        if (req.cookies['token']) {
+            req.id = verifyTokenService(req.cookies['token'])
         }
     } catch (e) {
     } finally {

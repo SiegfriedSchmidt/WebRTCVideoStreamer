@@ -1,6 +1,7 @@
 import express from "express";
 import * as http from "http";
 import * as https from "https";
+import cookieParser from 'cookie-parser'
 import {readFileSync} from "fs";
 import {nanoid} from "nanoid";
 import createSocket from "./socket";
@@ -13,7 +14,7 @@ import restrictAccessMiddleware from "./middlewares/restrictAccessMiddleware";
 
 const PORT = Number(process.env.PORT) || 9449
 const ENV = process.env.NODE_ENV || 'development';
-const HOSTNAME = ENV === 'development' ? "192.168.1.15" : "localhost"
+const HOSTNAME = ENV === 'development' ? "localhost" : "localhost"
 const STATIC = ENV === 'development' ? path.join(__dirname, '../../../frontend/dist') : path.join(__dirname, '../../dist/')
 
 export const loginUrl = '/user/login'
@@ -38,6 +39,7 @@ createSocket(server)
 // middleware
 app.use(express.json())
 app.use(express.urlencoded({extended: false}))
+app.use(cookieParser())
 
 // my middleware
 app.use(loggerMiddleware)

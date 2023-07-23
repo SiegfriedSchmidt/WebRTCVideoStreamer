@@ -12,22 +12,17 @@
         }
 
         async function sendPassword(password) {
-            const body = JSON.stringify({password: await sha256(password)})
             const response = await fetch('/user/auth', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body
+                body: JSON.stringify({password: await sha256(password)})
             })
             if (!response.ok) {
-                return {status: 'Internal server error', data: ''}
+                return {message: 'Internal server error', success: false}
             }
 
-            const data = await response.json()
-            if (response.status === 200) {
-                return {status: 'Success', data: data}
-            } else {
-                return {status: data, data: ''}
-            }
+            const message = await response.text()
+            return {message: message, success: response.status === 200}
         }
 
         window.addEventListener('DOMContentLoaded', () => {
@@ -35,10 +30,9 @@
             const statusElement = document.getElementById('status')
             passwordElement.addEventListener('keyup', async e => {
                 if (e.key === 'Enter' || e.keyCode === 13) {
-                    const {status, data} = await sendPassword(passwordElement.value)
-                    statusElement.innerText = status
-                    if (data) {
-                        document.cookie = `token=${data}`
+                    const {message, success} = await sendPassword(passwordElement.value)
+                    statusElement.innerText = message
+                    if (success) {
                         window.location = '/'
                     }
                 }
