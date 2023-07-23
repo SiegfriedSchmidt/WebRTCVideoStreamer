@@ -12,7 +12,7 @@ const handler: RequestHandler = (req, res, next) => {
         const hashPassword = sha256(req.body.password.toString())
         if (hashPassword === PASSWORD) {
             const token = makeJWTService({id: getID()})
-            res.cookie('token', token, {httpOnly: true, sameSite: true, secure: true})
+            res.cookie('token', token, {httpOnly: true, sameSite: true, secure: true, encode: String})
             res.status(serverStatuses.OK).send('Success')
         } else {
             res.status(serverStatuses.Error).send('Wrong password')

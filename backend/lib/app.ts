@@ -14,6 +14,7 @@ import restrictAccessMiddleware from "./middlewares/restrictAccessMiddleware";
 
 const PORT = Number(process.env.PORT) || 9449
 const ENV = process.env.NODE_ENV || 'development';
+const PROTOCOL = ENV === 'development' ? "https" : "http"
 const HOSTNAME = ENV === 'development' ? "localhost" : "localhost"
 const STATIC = ENV === 'development' ? path.join(__dirname, '../../../frontend/dist') : path.join(__dirname, '../../dist/')
 
@@ -24,7 +25,7 @@ export const TOKEN = nanoid(32)
 export const PASSWORD = 'lE8TIJicCXMGxqb+vAo8DLg5yfqFxtbZR1prErM1DVU='
 
 const app = express()
-const server = ENV === 'development'
+const server = PROTOCOL === 'https'
     ?
     https.createServer({
         key: readFileSync("certs/tls.key"),
@@ -51,4 +52,4 @@ app.use(express.static(STATIC))
 app.use('/user', usersRouter)
 
 // start
-server.listen(PORT, HOSTNAME, () => console.info(`Server running on ${HOSTNAME}:${PORT} in ${ENV} mode`));
+server.listen(PORT, HOSTNAME, () => console.info(`Server running on ${PROTOCOL}://${HOSTNAME}:${PORT} in ${ENV} mode`));

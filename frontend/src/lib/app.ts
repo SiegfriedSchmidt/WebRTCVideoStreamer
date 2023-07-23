@@ -45,27 +45,27 @@ function addLog(log: string, color?: string) {
     logsList.insertAdjacentHTML('beforeend', logElement)
 }
 
-setInterval(async () => {
-    // addLog(`ice gathering state: ${peerConnection.iceGatheringState}`, 'yellow')
-    addLog(`ice connection state: ${peerConnection.iceConnectionState}`, 'yellow')
-    const statsReport = await peerConnection.getStats();
-    statsReport.forEach(report => {
-        if (report.type === 'candidate-pair') {
-            console.log('Candidate Pair:', report.state, 'RTT:', report.currentRoundTripTime);
-        }
-    });
-    // addLog(`connection stats`, 'yellow')
-    // addLog(`signaling state: ${peerConnection.signalingState}`, 'yellow')
-}, 2000)
+// setInterval(async () => {
+//     // addLog(`ice gathering state: ${peerConnection.iceGatheringState}`, 'yellow')
+//     addLog(`ice connection state: ${peerConnection.iceConnectionState}`, 'yellow')
+//     const statsReport = await peerConnection.getStats();
+//     statsReport.forEach(report => {
+//         if (report.type === 'candidate-pair') {
+//             console.log('Candidate Pair:', report.state, 'RTT:', report.currentRoundTripTime);
+//         }
+//     });
+//     // addLog(`connection stats`, 'yellow')
+//     // addLog(`signaling state: ${peerConnection.signalingState}`, 'yellow')
+// }, 2000)
 
 // Setup media sources
 webcamButton.onclick = async () => {
     // localStream = await navigator.mediaDevices.getUserMedia({video: {facingMode: 'environment'}, audio: false});
-    localStream = await navigator.mediaDevices.getUserMedia({video: true, audio: true});
+    // localStream = await navigator.mediaDevices.getUserMedia({video: true, audio: true});
     // localStream = await navigator.mediaDevices.getDisplayMedia({video: true, audio: true});
 
     addLog('web camera started.')
-    // localStream = new MediaStream()
+    localStream = new MediaStream()
     remoteStream = new MediaStream();
 
     // Push tracks from local stream to peer connection

@@ -10,7 +10,7 @@ export default function (auth: string): string {
             .digest('base64')
 
         if (signature === tokenParts[2]) {
-            return JSON.parse(Buffer.from(tokenParts[1], 'base64').toString('utf8'))
+            return JSON.parse(Buffer.from(tokenParts[1], 'base64').toString('utf8'))['id']
         }
     } catch (e) {
     }
