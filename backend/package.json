@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "npx tsc",
-    "postbuild": "cp package.json build/package.json && cp html build/html && cd build && npm install --only=production",
+    "postbuild": "cp package.json build/package.json && cp -r html build/html && cd build && npm install --only=production",
     "start": "node build/index.js",
     "dev": "concurrently \"npx tsc --watch\" \"nodemon -q build/index.js\""
   },

@@ -20,7 +20,7 @@ const STATIC = ENV === 'development' ? path.join(__dirname, '../../../frontend/d
 
 export const loginUrl = '/user/login'
 export const allowedUrls = [loginUrl, '/user/auth']
-export const loginPagePath = path.join(__dirname, '../../html/loginPage.html')
+export const loginPagePath = path.join(__dirname, '../html/loginPage.html')
 export const TOKEN = nanoid(32)
 export const PASSWORD = 'lE8TIJicCXMGxqb+vAo8DLg5yfqFxtbZR1prErM1DVU='
 
