@@ -3,13 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <title>Login</title>
-    <script defer>
-        fetch('/user/auth', {method: 'POST'}).then((res) => {
-            console.log(res)
+    <script>
+        async function sha256(message) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(message);
+            const buffer = await crypto.subtle.digest("SHA-256", data)
+            return window.btoa(String.fromCharCode.apply(null, Array.from(new Uint8Array(buffer))));
+        }
+
+        async function sendPassword(password) {
+            const body = JSON.stringify({password: await sha256(password)})
+            const response = await fetch('/user/auth', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body
+            })
+            if (!response.ok) {
+                return {status: 'Internal server error', data: ''}
+            }
+
+            const data = await response.json()
+            if (response.status === 200) {
+                return {status: 'Success', data: data}
+            } else {
+                return {status: data, data: ''}
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const passwordElement = document.getElementById('password')
+            const statusElement = document.getElementById('status')
+            passwordElement.addEventListener('keyup', async e => {
+                if (e.key === 'Enter' || e.keyCode === 13) {
+                    const {status, data} = await sendPassword(passwordElement.value)
+                    statusElement.innerText = status
+                    if (data) {
+                        document.cookie = `token=${data}`
+                        window.location = '/'
+                    }
+                }
+            })
         })
     </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .container {
+            display: flex;
+            width: 100vw;
+            height: 100vh;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        label {
+            font-size: 18pt;
+            margin: 7px;
+        }
+
+        input {
+            font-size: 14pt;
+            margin: 7px;
+            padding: 5px;
+            border: solid 1px black;
+            border-radius: 5px;
+        }
+
+        input:focus {
+            outline: none;
+        }
+
+        h1 {
+            font-weight: normal;
+            font-size: 25pt;
+        }
+    </style>
 </head>
 <body>
-void
+<div class="container">
+    <h1 id="status">Enter password</h1>
+    <div>
+        <label for="password">PASSWORD</label>
+        <input id="password"/>
+    </div>
+</div>
 </body>
 </html>

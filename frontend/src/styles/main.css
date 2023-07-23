@@ -70,7 +70,7 @@ video {
     color: #adacac;
 }
 
-.container-fields label{
+.container-fields label {
     margin-left: 10px;
     font-size: 15pt;
 }
@@ -93,7 +93,7 @@ video {
 
 .container-fields input:disabled {
     border-color: #b4b4b4;
-    background-color:  #cecece;
+    background-color: #cecece;
 }
 
 .log-block {
