@@ -15,7 +15,7 @@ import restrictAccessMiddleware from "./middlewares/restrictAccessMiddleware";
 const PORT = Number(process.env.PORT) || 9449
 const ENV = process.env.NODE_ENV || 'development';
 const PROTOCOL = ENV === 'development' ? "https" : "http"
-const HOSTNAME = ENV === 'development' ? "localhost" : "localhost"
+const HOSTNAME = ENV === 'development' ? "192.168.1.15" : "localhost"
 const STATIC = ENV === 'development' ? path.join(__dirname, '../../../frontend/dist') : path.join(__dirname, '../../dist/')
 
 export const loginUrl = '/user/login'

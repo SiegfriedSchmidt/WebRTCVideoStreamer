@@ -26,7 +26,8 @@ export default (server: HttpsServer | HttpServer) => {
     const io = new IOServer<ClientToServerEvents, ServerToClientEvents, InterServerEvents, SocketData>(server, {
         path: '/socket.io/',
         cors: {
-            origin: '*'
+            origin: "https://sccom.ru",
+            methods: ["GET", "POST"]
         }
     });
 
