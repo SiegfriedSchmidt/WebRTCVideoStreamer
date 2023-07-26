@@ -1,5 +1,5 @@
-import io, {Socket} from "socket.io-client";
-import {ClientToServerEvents, ServerToClientEvents} from "./interfaces";
+import io from "socket.io-client";
+import SocketType from "./socketType";
 
 const servers: RTCConfiguration = {
     iceServers: [
@@ -12,7 +12,7 @@ const servers: RTCConfiguration = {
 
 // Global State
 const startTime = (new Date()).getTime()
-let socket: Socket<ServerToClientEvents, ClientToServerEvents>
+let socket: SocketType
 const peerConnection = new RTCPeerConnection(servers)
 let localID: string;
 let remoteID: string;
@@ -32,11 +32,8 @@ const localIDLabel = document.getElementById('localID') as HTMLLabelElement;
 const remoteIDLabel = document.getElementById('remoteID') as HTMLLabelElement;
 const logsList = document.getElementById('logs') as HTMLLabelElement;
 
-function createLogElement(time: string, text: string, color?: string): string {
-    if (color) {
-        return `<div class="log"><p style="color: ${color}" class="log-text">${time} ${text}</p></div>`
-    }
-    return `<div class="log"><p class="log-text">${time} ${text}</p></div>`
+function createLogElement(time: string, text: string, color = 'black'): string {
+    return `<div class="log"><p style="color: ${color}" class="log-text">${time} ${text}</p></div>`
 }
 
 function addLog(log: string, color?: string) {
@@ -61,11 +58,11 @@ function addLog(log: string, color?: string) {
 // Setup media sources
 webcamButton.onclick = async () => {
     // localStream = await navigator.mediaDevices.getUserMedia({video: {facingMode: 'environment'}, audio: false});
-    // localStream = await navigator.mediaDevices.getUserMedia({video: true, audio: true});
+    localStream = await navigator.mediaDevices.getUserMedia({video: true, audio: false});
     // localStream = await navigator.mediaDevices.getDisplayMedia({video: true, audio: true});
+    // localStream = new MediaStream()
 
     addLog('web camera started.')
-    localStream = new MediaStream()
     remoteStream = new MediaStream();
 
     // Push tracks from local stream to peer connection
@@ -133,9 +130,7 @@ function socketConnect() {
         addLog(`receive ice candidate, ${data.candidate}`)
         addLog(`ice candidate gathering stage: ${peerConnection.iceGatheringState}`, 'yellow')
         addLog(`ice candidate connection stage: ${peerConnection.iceConnectionState}`, 'yellow')
-        setTimeout(async () => {
-            await peerConnection.addIceCandidate(data)
-        }, 3000)
+        await peerConnection.addIceCandidate(data)
     })
 }
 

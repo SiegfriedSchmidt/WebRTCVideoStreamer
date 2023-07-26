@@ -1,2 +1,2 @@
 import "./styles/main.css"
-import "./lib/app"
+import "./lib/app2"
