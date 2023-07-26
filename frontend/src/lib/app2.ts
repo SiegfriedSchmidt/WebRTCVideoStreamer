@@ -23,25 +23,26 @@ const remoteIDLabel = document.getElementById('remoteID') as HTMLLabelElement;
 const logsList = document.getElementById('logs') as HTMLLabelElement;
 webcamVideo.muted = true
 
-const localStream = await navigator.mediaDevices.getUserMedia({video: true, audio: false});
+// const localStream = await navigator.mediaDevices.getUserMedia({video: true, audio: false});
+const localStream = new MediaStream()
 const remoteStream = new MediaStream()
 webcamVideo.srcObject = localStream;
 remoteVideo.srcObject = remoteStream;
 
 const socketConnection = new SocketConnection()
 await socketConnection.init()
-localIDLabel.innerText = socketConnection.id
+localIDLabel.innerText = socketConnection.name
 
-// Setup media sources
 webcamButton.onclick = async () => {
     callButton.disabled = false;
     callInput.disabled = false;
     answerButton.disabled = false;
     webcamButton.disabled = true;
 };
-webcamButton.click()
-
 
 callButton.onclick = async () => {
-
+    socketConnection.socket.emit('sendCall', callInput.value, ({accept, message}) => {
+        if (!accept) return alert(message)
+        console.log('READY')
+    })
 }

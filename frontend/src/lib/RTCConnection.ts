@@ -26,22 +26,22 @@ export default class RTCConnection {
 
         this.pc.onicecandidate = (event) => {
             if (event.candidate) {
-                this.socket.emit('sendIceCandidate', {id: this.peerID, data: event.candidate}, () => {
+                this.socket.emit('sendIceCandidate', {name: this.peerID, data: event.candidate}, () => {
                 })
             }
         }
 
-        this.socket.on('receiveSDP', async ({id, data}) => {
+        this.socket.on('receiveSDP', async ({name, data}) => {
             await this.pc.setRemoteDescription(data);
             if (data.type === 'offer') {
                 const answer = await this.pc.createAnswer();
                 await this.pc.setLocalDescription(answer);
-                this.socket.emit('sendSDP', {id, data: {type: answer.type, sdp: answer.sdp}}, () => {
+                this.socket.emit('sendSDP', {name, data: {type: answer.type, sdp: answer.sdp}}, () => {
                 })
             }
         })
 
-        this.socket.on('receiveIceCandidate', async ({id, data}) => {
+        this.socket.on('receiveIceCandidate', async ({name, data}) => {
             await this.pc.addIceCandidate(data)
         })
     }
@@ -62,9 +62,9 @@ export default class RTCConnection {
         const offerDescription = await this.pc.createOffer();
         return new Promise((resolve, reject) => {
             this.socket.emit('sendSDP', {
-                id: this.peerID,
+                name: this.peerID,
                 data: {type: offerDescription.type, sdp: offerDescription.sdp}
-            }, async ({error}) => {
+            }, async (error) => {
                 if (error) {
                     resolve('Incorrect ID')
                 } else {

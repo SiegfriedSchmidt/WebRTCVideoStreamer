@@ -65,7 +65,7 @@ const io: IOServerType = new IOServer(server, {
 io.use(verifyTokenMiddlewareSocket)
 
 // events
-io.on('connection', onConnection)
+io.on('connection', (socket) => onConnection(io, socket))
 
 // start
 server.listen(PORT, HOSTNAME, () => console.info(`Server running on ${PROTOCOL}://${HOSTNAME}:${PORT} in ${ENV} mode`));

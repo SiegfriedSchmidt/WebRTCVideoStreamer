@@ -1,11 +1,13 @@
+import {SocketType} from "./types/socketTypes";
+
 export class Database {
-    private clients: { [key: string]: string } = {}
+    private clients: { [key: string]: SocketType } = {}
 
     constructor() {
     }
 
-    addClient(name: string, id: string) {
-        this.clients[name] = id
+    addClient(name: string, socket: SocketType) {
+        this.clients[name] = socket
     }
 
     getClient(name: string) {
@@ -16,7 +18,11 @@ export class Database {
         delete this.clients[name]
     }
 
-    clientExists(id: string) {
-        return (id in this.clients)
+    clientExists(name: string) {
+        return (name in this.clients)
+    }
+
+    allClients() {
+        return Object.keys(this.clients)
     }
 }

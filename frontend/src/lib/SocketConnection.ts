@@ -22,8 +22,7 @@ import io from "socket.io-client";
 
 export default class SocketConnection {
     public socket: SocketTypes;
-    public id: string;
-
+    public name: string;
 
     constructor() {
     }
@@ -32,21 +31,14 @@ export default class SocketConnection {
         await this.socketConnect()
     }
 
-    registerEvents() {
+    socketConnect(): Promise<string> {
+        this.socket = io({path: '/socket.io/'})
         this.socket.on('disconnect', (reason) => {
             console.log(reason)
         })
-
-        this.socket.on('receiveSDP', ({id, data}) => {
-
-        })
-    }
-
-    socketConnect(): Promise<string> {
-        this.socket = io({path: '/socket.io/'})
         return new Promise((resolve, reject) => {
-            this.socket.on("connected", (id) => {
-                this.id = id;
+            this.socket.on("connected", (name) => {
+                this.name = name;
                 resolve('')
             })
         })
