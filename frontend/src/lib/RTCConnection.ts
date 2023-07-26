@@ -1,4 +1,4 @@
-import SocketType from "./socketType";
+import SocketTypes from "./socket/socketTypes";
 
 const servers: RTCConfiguration = {
     iceServers: [
@@ -15,7 +15,7 @@ export default class RTCConnection {
 
     constructor(
         public peerID: string,
-        public socket: SocketType,
+        public socket: SocketTypes,
     ) {
     }
 

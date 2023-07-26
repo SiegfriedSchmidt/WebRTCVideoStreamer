@@ -97,6 +97,11 @@
             const progress = (width) => progressElement.style.width = `${width}%`
             passwordElement.addEventListener('keyup', async e => {
                 if (e.key === 'Enter' || e.keyCode === 13) {
+                    if (passwordElement.disabled) {
+                        window.location = '/'
+                        return
+                    }
+     
                     progress(0)
                     progressDiv.style.display = 'block'
                     const {message, success} = await sendPassword(passwordElement.value)

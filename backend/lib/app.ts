@@ -4,13 +4,16 @@ import * as https from "https";
 import cookieParser from 'cookie-parser'
 import {readFileSync} from "fs";
 import {nanoid} from "nanoid";
-import createSocket from "./socket";
 import loggerMiddleware from "./middlewares/loggerMiddleware";
-import verifyTokenMiddleware from "./middlewares/verifyTokenMiddleware";
+import verifyTokenMiddlewareExpress from "./middlewares/verifyTokenMiddleware";
+import verifyTokenMiddlewareSocket from "./socket/middlewares/verifyTokenMiddleware";
 import usersRouter from "./routers/usersRouter";
 import sha256 from "./utils/sha256";
 import path from "path";
 import restrictAccessMiddleware from "./middlewares/restrictAccessMiddleware";
+import {IOServerType} from "./socket/types/socketTypes";
+import {Server as IOServer} from "socket.io";
+import onConnection from "./socket/onConnection";
 
 const PORT = Number(process.env.PORT) || 9449
 const ENV = process.env.NODE_ENV || 'development';
@@ -35,21 +38,34 @@ const server = PROTOCOL === 'https'
     :
     http.createServer(app)
 
-createSocket(server)
-
 // middleware
 app.use(express.json())
 app.use(express.urlencoded({extended: false}))
-app.use(cookieParser())
+// app.use(cookieParser())
 
 // my middleware
 app.use(loggerMiddleware)
-app.use(verifyTokenMiddleware)
+app.use(verifyTokenMiddlewareExpress)
 app.use(restrictAccessMiddleware)
 app.use(express.static(STATIC))
 
 // routers
 app.use('/user', usersRouter)
+
+// socket server
+const io: IOServerType = new IOServer(server, {
+    path: '/socket.io/',
+    cors: {
+        origin: "https://sccom.ru",
+        methods: ["GET", "POST"]
+    }
+});
+
+// middleware
+io.use(verifyTokenMiddlewareSocket)
+
+// events
+io.on('connection', onConnection)
 
 // start
 server.listen(PORT, HOSTNAME, () => console.info(`Server running on ${PROTOCOL}://${HOSTNAME}:${PORT} in ${ENV} mode`));

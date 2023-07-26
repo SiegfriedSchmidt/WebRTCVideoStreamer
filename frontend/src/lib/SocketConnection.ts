@@ -1,4 +1,4 @@
-import SocketType from "./socketType";
+import SocketTypes from "./socket/socketTypes";
 import io from "socket.io-client";
 
 // class EventEmitter {
@@ -21,7 +21,7 @@ import io from "socket.io-client";
 // }
 
 export default class SocketConnection {
-    public socket: SocketType;
+    public socket: SocketTypes;
     public id: string;
 
 

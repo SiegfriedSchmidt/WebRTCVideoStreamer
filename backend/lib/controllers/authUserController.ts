@@ -7,6 +7,7 @@ import {RequestHandler} from "express";
 
 const handler: RequestHandler = (req, res, next) => {
     try {
+        if (req.id) return res.status(serverStatuses.Error).send('You are already authenticated')
         if (!(req.body.password)) return res.status(serverStatuses.Error).send('Password is empty')
 
         const hashPassword = sha256(req.body.password.toString())

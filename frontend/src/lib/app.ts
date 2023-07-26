@@ -1,5 +1,5 @@
 import io from "socket.io-client";
-import SocketType from "./socketType";
+import SocketTypes from "./socket/socketTypes";
 
 const servers: RTCConfiguration = {
     iceServers: [
@@ -12,7 +12,7 @@ const servers: RTCConfiguration = {
 
 // Global State
 const startTime = (new Date()).getTime()
-let socket: SocketType
+let socket: SocketTypes
 const peerConnection = new RTCPeerConnection(servers)
 let localID: string;
 let remoteID: string;
