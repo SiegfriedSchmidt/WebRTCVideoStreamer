@@ -18,7 +18,7 @@ import onConnection from "./socket/onConnection";
 const PORT = Number(process.env.PORT) || 9449
 const ENV = process.env.NODE_ENV || 'development';
 const PROTOCOL = ENV === 'development' ? "https" : "http"
-const HOSTNAME = ENV === 'development' ? "192.168.1.15" : "localhost"
+const HOSTNAME = ENV === 'development' ? "192.168.1.15" : "0.0.0.0"
 const STATIC = ENV === 'development' ? path.join(__dirname, '../../../frontend/dist') : path.join(__dirname, '../../dist/')
 
 export const loginUrl = '/user/login'

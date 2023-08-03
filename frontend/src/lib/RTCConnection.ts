@@ -11,6 +11,7 @@ const servers: RTCConfiguration = {
 
 export default class RTCConnection {
     public startTime = (new Date()).getTime()
+    public peerConfirmed = false
     public pc = new RTCPeerConnection(servers)
 
     constructor(
@@ -30,6 +31,10 @@ export default class RTCConnection {
                 })
             }
         }
+
+        this.socket.on('receiveConfirmCall', async () => {
+            this.peerConfirmed = true
+        })
 
         this.socket.on('receiveSDP', async ({name, data}) => {
             await this.pc.setRemoteDescription(data);
@@ -58,6 +63,17 @@ export default class RTCConnection {
         };
     }
 
+    awaitPeerAndSendOffer(sender: boolean) {
+        if (sender) {
+            if (this.peerConfirmed) this.sendOffer()
+            this.socket.on('receiveConfirmCall', async () => {
+                await this.sendOffer()
+            })
+        } else {
+            this.socket.emit('sendConfirmCall', this.peerID)
+        }
+    }
+
     async sendOffer(): Promise<string> {
         const offerDescription = await this.pc.createOffer();
         return new Promise((resolve, reject) => {
@@ -73,6 +89,13 @@ export default class RTCConnection {
                 resolve('')
             })
         })
+    }
+
+    closeConnection() {
+        this.pc.close()
+        this.socket.removeListener('receiveSDP')
+        this.socket.removeListener('receiveIceCandidate')
+        this.socket.removeListener('receiveConfirmCall')
     }
 
     async logReport() {

@@ -58,6 +58,7 @@ video {
     border-radius: 5px;
     font-size: 10pt;
     padding: 10px;
+    margin-right: 10px;
 }
 
 .container-fields button:hover {
@@ -85,6 +86,22 @@ video {
     text-align: center;
     font-size: 15pt;
     padding: 2px;
+}
+
+.text2 {
+    padding: 4px;
+    font-size: 15pt !important;
+}
+
+input[type=checkbox] {
+    /* Double-sized Checkboxes */
+    -ms-transform: scale(1.5); /* IE */
+    -moz-transform: scale(1.5); /* FF */
+    -webkit-transform: scale(1.5); /* Safari and Chrome */
+    -o-transform: scale(1.5); /* Opera */
+    transform: scale(1.5);
+    padding: 10px;
+    margin: 2px;
 }
 
 .container-fields input {
@@ -125,4 +142,24 @@ video {
 
 .container {
     display: flex;
+}
+
+.callButton {
+    animation: 1s infinite alternate callAnimation;
+}
+
+@keyframes callAnimation {
+    from {
+        padding: 10px;
+        font-size: 10pt;
+    }
+
+    to {
+        padding: 15px;
+        font-size: 12pt;
+    }
+}
+
+.no-animation {
+    animation: none !important;
 }

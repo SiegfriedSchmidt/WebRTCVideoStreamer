@@ -13,36 +13,105 @@ import RTCConnection from "./RTCConnection";
 
 const webcamVideo = document.getElementById('webcamVideo') as HTMLVideoElement;
 const remoteVideo = document.getElementById('remoteVideo') as HTMLVideoElement;
-const webcamButton = document.getElementById('webcamButton') as HTMLButtonElement;
 const callButton = document.getElementById('callButton') as HTMLButtonElement;
 const callInput = document.getElementById('callInput') as HTMLInputElement;
+const useAudioCheckbox = document.getElementById('useAudio') as HTMLInputElement;
+const useVideoCheckbox = document.getElementById('useVideo') as HTMLInputElement;
 const answerButton = document.getElementById('answerButton') as HTMLButtonElement;
+const rejectButton = document.getElementById('rejectButton') as HTMLButtonElement;
 const hangupButton = document.getElementById('hangupButton') as HTMLButtonElement;
 const localIDLabel = document.getElementById('localID') as HTMLLabelElement;
 const remoteIDLabel = document.getElementById('remoteID') as HTMLLabelElement;
 const logsList = document.getElementById('logs') as HTMLLabelElement;
 webcamVideo.muted = true
 
-// const localStream = await navigator.mediaDevices.getUserMedia({video: true, audio: false});
-const localStream = new MediaStream()
-const remoteStream = new MediaStream()
-webcamVideo.srcObject = localStream;
-remoteVideo.srcObject = remoteStream;
-
+let RTC: RTCConnection;
+let localStream: MediaStream
+let remoteStream: MediaStream
 const socketConnection = new SocketConnection()
 await socketConnection.init()
 localIDLabel.innerText = socketConnection.name
 
-webcamButton.onclick = async () => {
-    callButton.disabled = false;
-    callInput.disabled = false;
-    answerButton.disabled = false;
-    webcamButton.disabled = true;
-};
+function changeStateAnswerReject(disabled: boolean) {
+    answerButton.onclick = undefined
+    rejectButton.onclick = undefined
+    answerButton.disabled = disabled
+    rejectButton.disabled = disabled
+    callAnimation(!disabled)
+}
+
+function getUseAudioVideo() {
+    return {video: useVideoCheckbox.checked, audio: useAudioCheckbox.checked}
+}
+
+function setUseAudioVideo(video: boolean, audio: boolean) {
+    useVideoCheckbox.checked = video
+    useAudioCheckbox.checked = audio
+}
+
+function callAnimation(enable: boolean) {
+    if (enable) {
+        remoteIDLabel.classList.remove('no-animation')
+    } else {
+        remoteIDLabel.classList.add('no-animation')
+    }
+}
+
+socketConnection.socket.on('receiveCall', ({name, audio, video}, callback) => {
+    remoteIDLabel.innerText = name
+    changeStateAnswerReject(false)
+    answerButton.onclick = () => {
+        callback({accept: true, message: ''})
+        setUseAudioVideo(video, audio)
+        changeStateAnswerReject(true)
+        startConnection(name, false)
+    }
+    rejectButton.onclick = () => {
+        callback({accept: false, message: 'Звонок отклонен'})
+        changeStateAnswerReject(true)
+    }
+})
 
 callButton.onclick = async () => {
-    socketConnection.socket.emit('sendCall', callInput.value, ({accept, message}) => {
+    if (!useAudioCheckbox.checked && !useVideoCheckbox.checked) {
+        return alert('Audio and video disabled!')
+    }
+    socketConnection.socket.emit('sendCall', {name: callInput.value, ...getUseAudioVideo()}, ({accept, message}) => {
         if (!accept) return alert(message)
-        console.log('READY')
+        startConnection(callInput.value, true)
     })
+}
+
+hangupButton.onclick = () => {
+    callButton.disabled = false
+    hangupButton.disabled = true
+    closeConnection()
+}
+
+async function createStreams() {
+    localStream = await navigator.mediaDevices.getUserMedia(getUseAudioVideo())
+    remoteStream = new MediaStream()
+    webcamVideo.srcObject = localStream;
+    remoteVideo.srcObject = remoteStream;
+}
+
+async function startConnection(name: string, sender: boolean) {
+    callButton.disabled = true
+    hangupButton.disabled = false
+    RTC = new RTCConnection(name, socketConnection.socket)
+    RTC.initEvents()
+    await createStreams()
+    RTC.initMedia(localStream, remoteStream)
+    RTC.awaitPeerAndSendOffer(sender)
+}
+
+function closeConnection() {
+    RTC.closeConnection()
+    localStream.getTracks().forEach((track) => {
+        track.stop()
+    })
+    remoteStream.getTracks().forEach((track) => {
+        track.stop()
+    })
+    RTC = undefined
 }

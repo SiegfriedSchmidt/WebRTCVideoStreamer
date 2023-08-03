@@ -12,9 +12,15 @@ export default function (io: IOServerType, socket: SocketType) {
         console.log(`user disconnected ${socket.data.name}`)
     })
 
-    socket.on("sendCall", (name, callback) => {
+    socket.on("sendConfirmCall", (name) => {
         if (database.clientExists(name) && name != socket.data.name) {
-            database.getClient(name).emit('receiveCall', name, callback)
+            database.getClient(name).emit('receiveConfirmCall')
+        }
+    })
+
+    socket.on("sendCall", ({name, video, audio}, callback) => {
+        if (database.clientExists(name) && name != socket.data.name) {
+            database.getClient(name).emit('receiveCall', {name: socket.data.name, video, audio}, callback)
         } else {
             return callback({accept: false, message: 'Неправильный id'})
         }

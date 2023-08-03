@@ -9,7 +9,7 @@
     <title>VideoStreamer</title>
 </head>
 <body>
-<h2>WebRTC video streaming</h2>
+<h2>WebRTC video streaming <span id="localID" class="text">****</span></h2>
 
 <div class="videos">
       <span>
@@ -25,23 +25,22 @@
 <div class="container">
     <div class="container-fields">
         <div>
-            <button id="webcamButton">Включить камеру</button>
-            <h2 id="localID" class="text">****</h2>
-        </div>
-        <div>
             <button id="callButton">Позвонить</button>
             <input class="text" id="callInput" maxlength="4"/>
+            <label class="text2" for="useAudio">Audio</label><input type="checkbox" id="useAudio" name="scales" checked>
+            <label class="text2" for="useVideo">Video</label><input type="checkbox" id="useVideo" name="scales" checked>
         </div>
         <div>
-            <button id="answerButton">Ответить</button>
-            <h2 id="remoteID" class="text">NOTHING</h2>
+            <button disabled id="answerButton">Принять</button>
+            <button disabled id="rejectButton">Отклонить</button>
+            <h2 id="remoteID" class="callButton text no-animation">NOTHING</h2>
         </div>
         <div>
             <button id="hangupButton" disabled>Сбросить</button>
         </div>
     </div>
-    <div id='logs' class="log-block">
-    </div>
+    <!--    <div id='logs' class="log-block">-->
+    <!--    </div>-->
 </div>
 </body>
 </html>
