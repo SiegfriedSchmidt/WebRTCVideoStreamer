@@ -1,5 +1,6 @@
 .idea
 node_modules
+kubernetes
 dist
 certs
 build

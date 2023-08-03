@@ -12,5 +12,6 @@ RUN cd backend && \
 
 ENV NODE_ENV production
 ENV PORT 3000
+ENV PASSWORD fjwofaiongrpqowgkrp
 EXPOSE $PORT
 CMD ["node", "/app/build/index.js"]
